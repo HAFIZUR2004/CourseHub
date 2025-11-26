@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { signIn } from "next-auth/react";
 import { AiFillGoogleCircle, AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const RegisterPage = () => {
@@ -19,7 +20,8 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      // Backend register API call
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -33,21 +35,19 @@ const RegisterPage = () => {
         return;
       }
 
-      Swal.fire({ icon: "success", title: "Account Created!", text: "Logging in...", timer: 1200, showConfirmButton: false });
-
-      // Automatic login after register
-      const loginRes = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      // auto login using NextAuth credentials
+      const loginResult = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
       });
 
-      const loginData = await loginRes.json();
-
-      if (!loginRes.ok) {
-        Swal.fire({ icon: "error", title: "Login Failed", text: loginData.message });
+      if (loginResult?.error) {
+        Swal.fire({ icon: "success", title: "Account created!", text: "Please login manually." });
+        router.replace("/login");
       } else {
-        router.replace("/"); // redirect to homepage
+        Swal.fire({ icon: "success", title: "Account Created!", text: "Logging in...", timer: 1200, showConfirmButton: false });
+        router.replace("/");
       }
     } catch (err) {
       Swal.fire({ icon: "error", title: "Error", text: "Server not responding!" });
@@ -56,16 +56,10 @@ const RegisterPage = () => {
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = "http://localhost:5000/api/auth/google"; // Backend Google OAuth
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4">
-      {/* Animated Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 animate-gradient-background -z-10"></div>
 
-      {/* Form Card */}
       <div className="max-w-md w-full bg-white/20 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/30 animate-fadeInUp">
         <h2 className="text-3xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-white to-yellow-300">
           Create Account
@@ -73,8 +67,8 @@ const RegisterPage = () => {
 
         {/* Google Signup */}
         <button
-          onClick={handleGoogleSignup}
-          className="w-full mb-4 px-4 py-2 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white rounded flex items-center justify-center gap-2 hover:from-red-600 hover:via-pink-600 hover:to-red-700 transition animate-gradient-button"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+          className="w-full mb-4 px-4 py-2 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white rounded flex items-center justify-center gap-2 hover:from-red-600 hover:via-pink-600 hover:to-red-700 transition"
         >
           <AiFillGoogleCircle size={20} /> Continue with Google
         </button>
@@ -85,7 +79,6 @@ const RegisterPage = () => {
           <hr className="flex-grow border-white/50" />
         </div>
 
-        {/* Register Form */}
         <form onSubmit={handleRegister} className="space-y-4">
           <input
             type="text"
@@ -128,7 +121,7 @@ const RegisterPage = () => {
             className={`w-full px-4 py-2 rounded-full font-bold text-white shadow-lg transition-all ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-indigo-500 hover:via-pink-500 hover:to-purple-500 animate-gradient-button"
+                : "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-indigo-500 hover:via-pink-500 hover:to-purple-500"
             }`}
           >
             {loading ? "Registering..." : "Register"}
@@ -143,7 +136,6 @@ const RegisterPage = () => {
         </p>
       </div>
 
-      {/* Animations */}
       <style jsx>{`
         @keyframes gradientMove {
           0% { background-position: 0% 50%; }
@@ -154,17 +146,11 @@ const RegisterPage = () => {
           background-size: 600% 600%;
           animation: gradientMove 20s ease infinite;
         }
-        .animate-gradient-button {
-          background-size: 300% 300%;
-          animation: gradientMove 6s ease infinite;
-        }
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fadeInUp {
-          animation: fadeInUp 1s ease forwards;
-        }
+        .animate-fadeInUp { animation: fadeInUp 1s ease forwards; }
       `}</style>
     </div>
   );

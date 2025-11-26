@@ -110,6 +110,14 @@ const Itemlistpage = () => {
               <h2 className="text-xl font-semibold text-gray-900">{item.title}</h2>
               <p className="text-sm text-gray-700 mt-1 line-clamp-2">{item.description}</p>
               <p className="text-md font-medium text-gray-800 mt-2">Price: {item.price}</p>
+
+              {/* ✅ Details Button */}
+              <button
+                onClick={() => router.push(`/items/${item.id}`)}
+                className="mt-3 w-full py-2 rounded-lg bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors duration-300"
+              >
+                Details
+              </button>
             </div>
           ))}
       </div>

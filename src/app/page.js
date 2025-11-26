@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavbarPage from "./navbar/page";
 import FooterPage from "./footer/page";
-import Cardpage from "./Card/page";
 import BannerSlider from "./(landingpage)/banne/banner/page";
 import Page from "./(public)/home/page";
 import AddPage from "./products/addcourse/page";
@@ -23,6 +22,7 @@ export default function RootLayout({ children }) {
         
         <BannerSlider></BannerSlider>
         <Page></Page>
+       
 
         <main>{children}</main>
         
