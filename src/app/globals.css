@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
+/* --- Custom Variables --- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: Arial, Helvetica, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* --- Body Gradient Background --- */
+body {
+  font-family: var(--font-sans);
+  color: white;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+  background-size: 400% 400%;
+  animation: gradientShift 20s ease infinite;
 }
 
+/* --- Gradient Animation --- */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Extra Animated Background for Pages */
+@keyframes bgGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-bgGradient {
+  background: linear-gradient(270deg, #ec4899, #8b5cf6, #3b82f6, #f472b6);
+  background-size: 600% 600%;
+  animation: bgGradient 20s ease infinite;
+}
+
+/* Animated Button Gradient */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradientMove {
+  background-size: 300% 300%;
+  animation: gradientMove 6s ease infinite;
+}
+
+/* --- Slider Animations --- */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-slide {
+  animation: slide 18s linear infinite;
+}
+
+/* --- Fade In Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 1.2s ease forwards;
+}
+
+/* --- Dark Mode Support --- */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background: linear-gradient(135deg, #0a0a0a, #2c2c2c, #5a5a5a);
+    color: white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Links */
+a {
+  color: white;
+  transition: color 0.3s;
+}
+a:hover {
+  color: #fde047;
 }
