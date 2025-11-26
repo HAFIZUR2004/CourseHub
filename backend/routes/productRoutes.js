@@ -1,8 +1,5 @@
-import express from "express";
-const router = express.Router();
-
-// JSON Data (10 old products) - ✅ URLs fixed
-let products = [
+// data/products.js
+const products = [
   {
     id: 1,
     title: "Python for Kids",
@@ -85,46 +82,4 @@ let products = [
   }
 ];
 
-// =========================
-// 👉 GET all products
-// =========================
-router.get("/", (req, res) => {
-  res.json(products);
-});
-
-// =========================
-// 👉 GET product by ID
-// =========================
-router.get("/:id", (req, res) => {
-  const product = products.find((p) => p.id === +req.params.id);
-  if (!product)
-    return res.status(404).json({ error: "Product not found" });
-
-  res.json(product);
-});
-
-// =========================
-// 👉 POST: ADD NEW PRODUCT
-// =========================
-router.post("/", (req, res) => {
-  const { title, shortDesc, price, imgUrl } = req.body;
-
-  if (!title || !shortDesc || !price || !imgUrl) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  const newProduct = {
-    id: products.length + 1,
-    title,
-    description: shortDesc,
-    price: `$${price}`,
-    category: "Programming", // চাইলে UI থেকে পাঠাতে পারো
-    image: imgUrl
-  };
-
-  products.push(newProduct);
-
-  res.status(201).json(newProduct);
-});
-
-export default router;
+export default products;
