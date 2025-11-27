@@ -1,4 +1,3 @@
-// app/details/[id]/page.jsx
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -13,39 +12,27 @@ export default function DetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
   }, [status, router]);
 
-  // Fetch product details
   useEffect(() => {
     if (status !== "authenticated") return;
 
-    fetch(`http://localhost:5000/products/${id}`)
+    fetch(`/api/products/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Product not found");
         return res.json();
       })
       .then((data) => setItem(data))
-      .catch((err) => {
-        console.error(err);
-        setError(true);
-      })
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id, status]);
 
-  if (status === "loading")
+  if (status === "loading" || loading)
     return (
       <div className="min-h-screen flex items-center justify-center text-xl animate-pulse">
-        Checking authentication...
-      </div>
-    );
-
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-xl animate-pulse">
-        Loading product...
+        Loading...
       </div>
     );
 
@@ -74,13 +61,13 @@ export default function DetailPage() {
       <div className="max-w-3xl w-full bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 flex flex-col items-center animate-fadeIn">
         {item.image && (
           <img
-            src={item.image || item.imgUrl}
+            src={item.image}
             alt={item.title}
             className="w-full h-64 object-cover rounded-xl mb-6 shadow-lg"
           />
         )}
         <h1 className="text-3xl font-bold text-gray-900 mb-3">{item.title}</h1>
-        <p className="text-gray-700 mb-4">{item.description || item.shortDesc}</p>
+        <p className="text-gray-700 mb-4">{item.description}</p>
         <div className="flex gap-6 text-gray-900 font-medium text-lg">
           <p>Price: {item.price}</p>
           {item.category && <p>Category: {item.category}</p>}
