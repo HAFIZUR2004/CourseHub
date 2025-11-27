@@ -1,85 +1,27 @@
-// data/products.js
-const products = [
-  {
-    id: 1,
-    title: "Python for Kids",
-    description: "Learn the basics of Python programming in a fun and interactive way.",
-    price: "$49",
-    category: "Programming",
-    image: "https://i.ibb.co/rR83VQ5T/rubaitul-azad-ZIPFteu-R8k-unsplash.jpg"
-  },
-  {
-    id: 2,
-    title: "Scratch Adventures",
-    description: "Interactive game-based learning with Scratch for young coders.",
-    price: "$39",
-    category: "Programming",
-    image: "https://i.ibb.co/XrMXm4Wn/images-1.png"
-  },
-  {
-    id: 3,
-    title: "Robotics Fun",
-    description: "Build and code your own mini robots while having fun.",
-    price: "$59",
-    category: "STEM",
-    image: "https://i.ibb.co/60v4RGPt/jason-leung-j6-QZXBVys-E8-unsplash.jpg"
-  },
-  {
-    id: 4,
-    title: "Web Design Basics",
-    description: "Learn how to make simple websites using HTML & CSS.",
-    price: "$45",
-    category: "Design",
-    image: "https://i.ibb.co/20fCD9TY/web-design.jpg"
-  },
-  {
-    id: 5,
-    title: "Game Development",
-    description: "Create your first fun game using easy-to-learn tools.",
-    price: "$55",
-    category: "Programming",
-    image: "https://i.ibb.co/Y71ZTFns/pro-cyber-sport-gamer-relaxing-playing-video-games-using-vr-headset-late-night-virtual-shooter-game.jpg"
-  },
-  {
-    id: 6,
-    title: "JavaScript for Kids",
-    description: "Learn JavaScript basics through fun mini-projects.",
-    price: "$49",
-    category: "Programming",
-    image: "https://i.ibb.co/vvRDD00z/growtika-qaed-Ply-Uro-unsplash.jpg"
-  },
-  {
-    id: 7,
-    title: "Creative Coding",
-    description: "Use code to create art and interactive animations.",
-    price: "$50",
-    category: "Design",
-    image: "https://i.ibb.co/BHtnk15d/person-playing-3d-video-games-device.jpg"
-  },
-  {
-    id: 8,
-    title: "Math & Logic Games",
-    description: "Boost logical thinking and problem-solving skills.",
-    price: "$35",
-    category: "STEM",
-    image: "https://i.ibb.co/ZRrMBHsT/vd-photography-k0ffq4-Bdxm0-unsplash.jpg"
-  },
-  {
-    id: 9,
-    title: "App Development Basics",
-    description: "Learn how to design and build simple mobile apps.",
-    price: "$60",
-    category: "Programming",
-    image: "https://i.ibb.co/cchTCCDt/moritz-kindler-MEh-It-GTIb-WA-unsplash.jpg"
-  },
-  {
-    id: 10,
-    title: "Digital Storytelling",
-    description: "Create interactive stories using code and animation.",
-    price: "$42",
-    category: "Design",
-    image: "https://i.ibb.co/wZfJj41g/still-life-books-versus-technology.jpg"
-  }
-];
+// backend/routes/productRoutes.js
+import express from "express";
+import products from "../data/products.js";
 
-export default products;
+const router = express.Router();
+
+// Get all products
+router.get("/", (req, res) => {
+  res.json(products);
+});
+
+// Get product by id
+router.get("/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const product = products.find(p => p.id === id);
+  if (!product) return res.status(404).json({ message: "Product not found" });
+  res.json(product);
+});
+
+// Add a new product
+router.post("/", (req, res) => {
+  const newProduct = { id: products.length + 1, ...req.body };
+  products.push(newProduct);
+  res.json(newProduct);
+});
+
+export default router;

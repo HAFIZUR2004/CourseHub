@@ -1,36 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 const AddPage = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  // 🟡 If checking session → show loading screen
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/api/login"); // ⬅️ redirect to your login page
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-xl animate-pulse">
-        Checking authentication...
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated") return null; // avoid flash
-
-  // ===========================
-  // ⭐ Your previous form code
-  // ===========================
   const [title, setTitle] = useState("");
-  const [shortDesc, setShortDesc] = useState("");
+  const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
+  const [img, setImg] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -43,9 +18,9 @@ const AddPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
-          shortDesc,
-          price: Number(price),
-          imgUrl,
+          description: desc,
+          price,
+          image: img,
         }),
       });
 
@@ -54,32 +29,28 @@ const AddPage = () => {
       alert(`Product added: ${data.title}`);
 
       setTitle("");
-      setShortDesc("");
+      setDesc("");
       setPrice("");
-      setImgUrl("");
-    } catch (error) {
-      alert(error.message);
+      setImg("");
+    } catch (err) {
+      alert(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center -mb-16 pb-5 pt-12 px-4 overflow-hidden">
+    <div className="min-h-screen relative flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+      {/* Background Gradient + Animation */}
       <div className="absolute inset-0 animate-gradient-background -z-10"></div>
 
-      <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 via-white to-yellow-300 bg-clip-text text-transparent drop-shadow-lg mb-8 animate-fadeIn">
+      <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 via-white to-yellow-300 bg-clip-text text-transparent drop-shadow-lg mb-10 animate-fadeIn">
         Add New Product
       </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md p-8 rounded-3xl shadow-2xl border border-gray-200 animate-fadeInUp"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.85), rgba(245,245,245,0.85))",
-          backdropFilter: "blur(10px)",
-        }}
+        className="w-full max-w-md p-8 rounded-3xl shadow-2xl border border-gray-200 bg-white/90 backdrop-blur-md animate-fadeInUp"
       >
         <label className="block mb-5">
           <span className="text-gray-800 font-semibold">Title</span>
@@ -94,11 +65,11 @@ const AddPage = () => {
         </label>
 
         <label className="block mb-5">
-          <span className="text-gray-800 font-semibold">Short Description</span>
+          <span className="text-gray-800 font-semibold">Description</span>
           <input
             type="text"
-            value={shortDesc}
-            onChange={(e) => setShortDesc(e.target.value)}
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
             placeholder="Short description"
             required
             className="mt-2 w-full p-3 rounded-xl border border-gray-300 bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100"
@@ -121,8 +92,8 @@ const AddPage = () => {
           <span className="text-gray-800 font-semibold">Image URL</span>
           <input
             type="text"
-            value={imgUrl}
-            onChange={(e) => setImgUrl(e.target.value)}
+            value={img}
+            onChange={(e) => setImg(e.target.value)}
             placeholder="https://example.com/image.jpg"
             required
             className="mt-2 w-full p-3 rounded-xl border border-gray-300 bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100"
@@ -136,24 +107,19 @@ const AddPage = () => {
             ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
+                : "bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:scale-105"
             }`}
         >
           {loading ? "Adding..." : "Add Product"}
         </button>
       </form>
 
+      {/* Tailwind Animations */}
       <style jsx>{`
         @keyframes gradientMove {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
         .animate-gradient-background {
           background: linear-gradient(
@@ -165,6 +131,17 @@ const AddPage = () => {
           );
           background-size: 600% 600%;
           animation: gradientMove 20s ease infinite;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.8s ease forwards;
+        }
+        .animate-fadeInUp {
+          animation: fadeIn 0.8s ease forwards;
+          animation-delay: 0.2s;
         }
       `}</style>
     </div>

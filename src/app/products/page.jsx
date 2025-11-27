@@ -10,6 +10,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <h1 className="text-55">aaaaaaaaaaaaaaaaaaaaa</h1>
       {products.map((p) => (
         <div key={p.id} className="border p-4 rounded shadow hover:shadow-lg">
           <h2 className="font-bold text-lg">{p.title}</h2>

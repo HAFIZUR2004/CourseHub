@@ -11,6 +11,7 @@ export default function DetailPage() {
   const { data: session, status } = useSession();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -20,41 +21,81 @@ export default function DetailPage() {
   // Fetch product details
   useEffect(() => {
     if (status !== "authenticated") return;
+
     fetch(`http://localhost:5000/products/${id}`)
-      .then(res => res.json())
-      .then(data => setItem(data))
-      .catch(err => console.error(err))
+      .then((res) => {
+        if (!res.ok) throw new Error("Product not found");
+        return res.json();
+      })
+      .then((data) => setItem(data))
+      .catch((err) => {
+        console.error(err);
+        setError(true);
+      })
       .finally(() => setLoading(false));
   }, [id, status]);
 
-  if (status === "loading") return <p>Checking authentication...</p>;
-  if (loading) return <p>Loading product...</p>;
-  if (!item) return <p>Product not found</p>;
+  if (status === "loading")
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl animate-pulse">
+        Checking authentication...
+      </div>
+    );
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl animate-pulse">
+        Loading product...
+      </div>
+    );
+
+  if (error || !item)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-xl text-red-500">
+        <p>Product not found</p>
+        <button
+          onClick={() => router.back()}
+          className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+        >
+          Go Back
+        </button>
+      </div>
+    );
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 p-6 flex flex-col items-center">
       <button
         onClick={() => router.back()}
-        className="mb-4 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+        className="mb-6 px-4 py-2 bg-white/70 rounded hover:bg-white/90 shadow"
       >
-        Back
+        ← Back
       </button>
 
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow p-6">
+      <div className="max-w-3xl w-full bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 flex flex-col items-center animate-fadeIn">
         {item.image && (
           <img
-            src={item.image}
+            src={item.image || item.imgUrl}
             alt={item.title}
-            className="w-full h-64 object-cover rounded-lg mb-6"
+            className="w-full h-64 object-cover rounded-xl mb-6 shadow-lg"
           />
         )}
-        <h1 className="text-2xl font-bold mb-2">{item.title}</h1>
-        <p className="text-gray-700 mb-4">{item.description}</p>
-        <div className="flex gap-4 text-gray-800">
-          <p><strong>Price:</strong> {item.price}</p>
-          {item.category && <p><strong>Category:</strong> {item.category}</p>}
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">{item.title}</h1>
+        <p className="text-gray-700 mb-4">{item.description || item.shortDesc}</p>
+        <div className="flex gap-6 text-gray-900 font-medium text-lg">
+          <p>Price: {item.price}</p>
+          {item.category && <p>Category: {item.category}</p>}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.8s ease forwards;
+        }
+      `}</style>
     </div>
   );
 }
